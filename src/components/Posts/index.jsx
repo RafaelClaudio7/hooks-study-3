@@ -1,22 +1,47 @@
-import { useContext, useEffect } from "react"
-import { loadPosts } from "../../contexts/PostsProvider/actions";
-import { PostsContext } from "../../contexts/PostsProvider/context";
-
+import { useContext, useEffect, useRef } from 'react';
+import { CounterContext } from '../../contexts/CounterProvider/context';
+import { loadPosts } from '../../contexts/PostsProvider/actions';
+import { PostsContext } from '../../contexts/PostsProvider/context';
+import {
+  decrementCounter,
+  incrementCounter,
+} from '../../contexts/CounterProvider/action';
 
 
 export const Posts = () => {
-    const  postsContext = useContext(PostsContext);
-    const {postsState, postsDispatch} = postsContext;
+  const isMounted = useRef(true);
+  const postsContext = useContext(PostsContext);
+  const { postsState, postsDispatch } = postsContext;
 
+  const counterContext = useContext(CounterContext);
+  const {counterState, counterDispatch} = counterContext;
 
-    useEffect(() => {
-        loadPosts(postsDispatch);
-    },[postsDispatch]);
+  useEffect(() => {
+    loadPosts(postsDispatch).then((dispatch) => {
+      if (isMounted.current) {
+        dispatch();
+      }
+    });
 
-    return (
-        <div>
-            <h1>POSTS</h1>
-            {postsState.posts.map(p => <p key={p.id}>{p.title}</p>)}
-        </div>
-    )
-}
+    return () => {
+      isMounted.current = false;
+    };
+  }, [postsDispatch]);
+
+  return (
+    <div>
+      <button onClick={() => incrementCounter(counterDispatch)}>Counter {counterState.counter}</button>
+      <button onClick={() => decrementCounter(counterDispatch)}>Counter {counterState.counter}</button>
+      <h1>POSTS</h1>
+      {postsState.loading && (
+        <p>
+          <strong>Carregando posts...</strong>
+        </p>
+      )}
+
+      {postsState.posts.map((p) => (
+        <p key={p.id}>{p.title}</p>
+      ))}
+    </div>
+  );
+};

@@ -1,15 +1,18 @@
+import './styles.css';
 
-import { Posts } from "../../components/Posts";
-import { PostsProvider } from "../../contexts/PostsProvider";
-import "./App.css";
+import { PostsProvider } from '../../contexts/PostsProvider/index';
+import { Posts } from '../../components/Posts';
+import { CounterProvider } from '../../contexts/CounterProvider';
 
-// App.jsx
 function App() {
-
   return (
-    <PostsProvider>
-      <Posts/>
-    </PostsProvider>
+    <CounterProvider>
+      <PostsProvider>
+        <div>
+          <Posts />
+        </div>
+      </PostsProvider>
+    </CounterProvider>
   );
 }
 
